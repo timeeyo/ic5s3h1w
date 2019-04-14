@@ -8,6 +8,9 @@
 #include <ctype.h>
 
 // You may define any helper functions you want. Place them in helpers.c/.h
+int char_check(char c);
+int num_check(char c);
+int space_check(char c);
 
 
 // main program
@@ -18,28 +21,37 @@ int main (int argc, char *argv[])
     char input;
     int count = 0;
     int start = 0;
-    printf("%d\n", argc);
+    if((input = fgetc(stdin)) == EOF)
+    {
+        return 1;
+    }
     if(argc >= 2)
     {
         //Symbol Check -S
         if((strcmp(argv[1], "-S")) == 0)
         {
-            if(argc > 2)
+            if(argc == 3)
             {
                 if((strcmp(argv[2], "-O")) == 0)
                 {
-                    while((input = fgetc(stdin)) != EOF)
+                    do
                     {
                         int result =char_check(input);
                         if(result == 1)
                         {
                             count ++;
                         }
+                        else if (result == 2)
+                        {
+                            printf("%d\n",count);
+                            return(1);
+                        }
                         else
                         {
                             fprintf(stderr,"%c", input);
                         }
-                    }
+                        
+                    }while((input = fgetc(stdin)) != EOF);
                     printf("%d\n",count);
                     return(0);
                 }
@@ -48,24 +60,37 @@ int main (int argc, char *argv[])
                     return(1);
                 }
             }
-            else
+            else if(argc == 2)
             {
-                while((input = fgetc(stdin)) != EOF)
+                do
                 {
-                    count += char_check(input);
-                }
+                    int result =char_check(input);
+                    if(result == 1)
+                    {
+                        count ++;
+                    }
+                    else if (result == 2)
+                    {
+                        return(1);
+                    }
+                    
+                }while((input = fgetc(stdin)) != EOF);
                 printf("%d\n",count);
                 return(0);
+            }
+            else
+            {
+                return(1);
             }
         }
         //num_check -N
         else if((strcmp(argv[1], "-N")) == 0)
         {
-            if(argc > 2)
+            if(argc == 3)
             {
                 if((strcmp(argv[2], "-O")) == 0)
                 {
-                    while((input = fgetc(stdin)) != EOF)
+                    do
                     {
                         int result = num_check(input);
                         if(result == 1 && start == 0)
@@ -82,7 +107,7 @@ int main (int argc, char *argv[])
                         {
                             fprintf(stderr,"%c",input);
                         }
-                    }
+                    }while((input = fgetc(stdin)) != EOF);
                     printf("%d\n",count);
                     return(0);
                 }
@@ -91,9 +116,9 @@ int main (int argc, char *argv[])
                     return(1);
                 }
             }
-            else
+            else if(argc == 2)
             {
-                while((input = fgetc(stdin)) != EOF)
+                do
                 {
                     int result = num_check(input);
                     if(result == 1 && start == 0)
@@ -105,19 +130,23 @@ int main (int argc, char *argv[])
                         count ++;
                         start = 0;
                     }
-                }
+                }while((input = fgetc(stdin)) != EOF);
                 printf("%d\n",count);
                 return(0);
+            }
+            else
+            {
+                return (1);
             }
         }
         //leading space check -L
         else if(strcmp(argv[1], "-L") == 0)
         {
-            if(argc > 2)
+            if(argc == 3)
             {
                 if((strcmp(argv[2], "-O")) == 0)
                 {
-                    while((input = fgetc(stdin)) != EOF)
+                    do
                     {
                         int result = space_check(input);
                         if(start == 0 && result == 1)
@@ -137,7 +166,7 @@ int main (int argc, char *argv[])
                         {
                             start =0;
                         }
-                    }
+                    }while((input = fgetc(stdin)) != EOF);
                     printf("%d\n",count);
                     return(0);
                 }
@@ -146,23 +175,30 @@ int main (int argc, char *argv[])
                     return(1);
                 }
             }
-            else
+            else if(argc == 2)
             {
-                while((input = fgetc(stdin)) != EOF)
+                do
                 {
                     int result = space_check(input);
                     if(start == 0 && result == 1)
                     {
                         count ++;
+                    }
+                    else if(start == 0 && result == 0)
+                    {
                         start = 1;
                     }
                     if(input == '\n')
                     {
                         start =0;
                     }
-                }
+                }while((input = fgetc(stdin)) != EOF);
                 printf("%d\n",count);
                 return(0);
+            }
+            else
+            {
+                return(1);
             }
         }
         else if(strcmp(argv[1], "-E") == 0)
@@ -173,25 +209,39 @@ int main (int argc, char *argv[])
             }
             else
             {
-                int num = atoi(argv[2]);
-                int i;
-                while((input = fgetc(stdin)) != EOF)
+                if(argc <= 4)
                 {
-                    if(input == '\t')
+                    if(argc == 4 && (strcmp(argv[3], "-O")) != 0)
                     {
-                        count ++;
-                        for(i = 0; i < num; i++)
-                        {
-                            fprintf(stderr,"%c",' ');
-                        }
+                        return(1);
                     }
                     else
                     {
-                        fprintf(stderr,"%c",input);
+                        int num = atoi(argv[2]);
+                        int i;
+                        do
+                        {
+                            if(input == '\t')
+                            {
+                                count ++;
+                                for(i = 0; i < num; i++)
+                                {
+                                    fprintf(stderr,"%c",' ');
+                                }
+                            }
+                            else
+                            {
+                                fprintf(stderr,"%c",input);
+                            }
+                        }while((input = fgetc(stdin)) != EOF);
+                        printf("%d\n",count);
+                        return(0);
                     }
                 }
-                printf("%d\n",count);
-                return(0);
+                else
+                {
+                    return(1);
+                }
             }
         }
         else if(strcmp(argv[1], "-C") == 0)
@@ -202,54 +252,67 @@ int main (int argc, char *argv[])
             }
             else
             {
-                int num = atoi(argv[2]);
-                int space_count = 0;
-                
-                while((input = fgetc(stdin)) != EOF)
+                if(argc <= 4)
                 {
-                    
-                    if(start == 0 && input == ' ')
+                    if(argc == 4 && (strcmp(argv[3], "-O")) != 0)
                     {
-                        start = 1;
-                        space_count ++;
-                        if(num == 1)
-                        {
-                            fprintf(stderr,"%s","\t");
-                            space_count = 0;
-                            start = 0;
-                        }
+                        return(1);
                     }
-                    else if(start == 1 && input != ' ')
+                    else
                     {
-                        start = 0;
-                        int i;
-                        for(i = 0; i < space_count; i++)
-                        {
-                            fprintf(stderr,"%s"," ");
-                        }
-                        fprintf(stderr,"%c",input);
-                        space_count = 0;
+                        int num = atoi(argv[2]);
+                        int space_count = 0;
                         
-                    }
-                    else if(start == 1 && input == ' ')
-                    {
-                        space_count ++;
-                        if(space_count == num)
+                        do
                         {
-                            count ++;
-                            fprintf(stderr,"%s","\t");
-                            space_count = 0;
-                            start = 0;
-                        }
+                            if(start == 0 && input == ' ')
+                            {
+                                start = 1;
+                                space_count ++;
+                                if(num == 1)
+                                {
+                                    fprintf(stderr,"%s","\t");
+                                    space_count = 0;
+                                    start = 0;
+                                }
+                            }
+                            else if(start == 1 && input != ' ')
+                            {
+                                start = 0;
+                                int i;
+                                for(i = 0; i < space_count; i++)
+                                {
+                                    fprintf(stderr,"%s"," ");
+                                }
+                                fprintf(stderr,"%c",input);
+                                space_count = 0;
+                                
+                            }
+                            else if(start == 1 && input == ' ')
+                            {
+                                space_count ++;
+                                if(space_count == num)
+                                {
+                                    count ++;
+                                    fprintf(stderr,"%s","\t");
+                                    space_count = 0;
+                                    start = 0;
+                                }
+                            }
+                            else if(start == 0 && input != ' ')
+                            {
+                                fprintf(stderr,"%c",input);
+                            }
+                            
+                        }while((input = fgetc(stdin)) != EOF);
+                        printf("%d\n",count);
+                        return(0);
                     }
-                    else if(start == 0 && input != ' ')
-                    {
-                        fprintf(stderr,"%c",input);
-                    }
-                    
                 }
-                printf("%d\n",count);
-                return(0);
+                else
+                {
+                    return(1);
+                }
             }
         }
         else
@@ -263,41 +326,3 @@ int main (int argc, char *argv[])
     }
 }
 
-int char_check(char c)
-{
-    if((c >= 33 && c <= 126) && !(c >= 97 && c <= 122)
-       && !(c >= 65 && c <=90) && !(c >= 48 && c <= 57))
-    {
-        return 1;
-    }
-    else
-    {
-        return 0;
-    }
-}
-
-int num_check(char c)
-{
-    if(c >= 48 && c <= 57)
-    {
-        return 1;
-    }
-    else
-    {
-        return 0;
-    }
-}
-
-
-int space_check(char c)
-{
-    
-    if(c == ' ' || c == '\t' || c == '\r' || c == '\v' || c == '\f')
-    {
-        return 1;
-    }
-    else
-    {
-    return 0;
-    }
-}

@@ -32,8 +32,7 @@ int num_check(char c)
 
 int space_check(char c)
 {
-    
-    if(c == ' ' || c == '\t' || c == '\r' || c == '\v' || c == '\f')
+    if(c == 32 || c == 9 || c == 11 || c == 12 || c == 13)
     {
         return 1;
     }

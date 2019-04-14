@@ -21,6 +21,7 @@ int main (int argc, char *argv[])
     char input;
     int count = 0;
     int start = 0;
+    int lead = 0;
     if((input = fgetc(stdin)) == EOF)
     {
         return 1;
@@ -149,22 +150,30 @@ int main (int argc, char *argv[])
                     do
                     {
                         int result = space_check(input);
-                        if(start == 0 && result == 1)
+                        if(result == 1)
                         {
-                            count ++;
+                            if (start == 0)
+                            {
+                                lead ++;
+                            }
+                            else
+                            {
+                                fprintf(stderr,"%c",input);
+                            }
                         }
-                        else if(start == 0 && result == 0)
+                        else
                         {
+                            start ++;
+                            if(input == '\n')
+                            {
+                                if(lead > 0)
+                                {
+                                    count ++;
+                                }
+                                lead = 0;
+                                start = 0;
+                            }
                             fprintf(stderr,"%c",input);
-                            start = 1;
-                        }
-                        else if(start == 1)
-                        {
-                            fprintf(stderr,"%c",input);
-                        }
-                        if(input == '\n')
-                        {
-                            start =0;
                         }
                     }while((input = fgetc(stdin)) != EOF);
                     printf("%d\n",count);
@@ -180,17 +189,25 @@ int main (int argc, char *argv[])
                 do
                 {
                     int result = space_check(input);
-                    if(start == 0 && result == 1)
+                    start ++;
+                    if(result == 1)
                     {
-                        count ++;
+                        if (start == 1)
+                        {
+                            lead ++;
+                        }
                     }
-                    else if(start == 0 && result == 0)
+                    else
                     {
-                        start = 1;
-                    }
-                    if(input == '\n')
-                    {
-                        start =0;
+                        if(input == '\n')
+                        {
+                            if(lead == 1)
+                            {
+                                count ++;
+                            }
+                            lead = 0;
+                            start = 0;
+                        }
                     }
                 }while((input = fgetc(stdin)) != EOF);
                 printf("%d\n",count);
